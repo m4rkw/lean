@@ -1,0 +1,11 @@
+<div>
+    <label for="<%=name%>"><%=label%>:</label>
+    <textarea name="message"><%=value%></textarea>
+</div>
+<% if error %>
+    <div>
+        <span class="error">
+            <%=error%>
+        </span>
+    </div>
+<% end %>

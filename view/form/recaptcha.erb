@@ -1,0 +1,8 @@
+<div class="g-recaptcha" data-sitekey="<%=config.get('recaptcha_key')%>"></div>
+<% if error %>
+    <div>
+        <span class="error">
+            <%=error%>
+        </span>
+    </div>
+<% end %>

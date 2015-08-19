@@ -1,0 +1,11 @@
+<div>
+    <label for="<%=name%>"><%=label%>:</label>
+    <input type="text" name="<%=name%>" id="<%=name%>" value="<%=value%>" />
+</div>
+<% if error %>
+    <div>
+        <span class="error">
+            <%=error%>
+        </span>
+    </div>
+<% end %>
