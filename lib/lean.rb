@@ -4,8 +4,8 @@ require 'shellwords'
 require 'net/smtp'
 require 'htmlentities'
 require 'erubis'
-require 'xmlsimple'
 require 'singleton'
+require 'sequel'
 
 $autoload_paths = [
     "core/",
@@ -54,6 +54,10 @@ class Lean
 
   def execute
     controller, method, args = Lean::Router::route
+
+    db = Lean::Config.get(:db)
+
+    Lean::DB.con = Sequel.connect("#{db[:type]}://#{db[:user]}:#{db[:pass]}@#{db[:host]}/#{db[:name]}")
 
     controller = Object::const_get(controller).new
 

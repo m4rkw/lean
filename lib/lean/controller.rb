@@ -3,6 +3,7 @@ class Lean::Controller
   include Lean::Renderer
 
   def initialize
+    @db = Lean::DB.con
     @layout = "main"
   end
 

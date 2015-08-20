@@ -7,7 +7,7 @@ class Lean::Router
       end
     end
 
-    raise "No config file found."
+    raise "routes.rb was not found."
   end
 
   def self.route

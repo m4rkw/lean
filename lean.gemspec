@@ -10,6 +10,7 @@ Gem::Specification.new do |s|
                     "lib/lean.rb",
                     "lib/lean/config.rb",
                     "lib/lean/controller.rb",
+                    "lib/lean/db.rb",
                     "lib/lean/form.rb",
                     "lib/lean/model.rb",
                     "lib/lean/renderer.rb",
@@ -29,6 +30,5 @@ Gem::Specification.new do |s|
   s.add_runtime_dependency "sequel", ["~> 4.25"]
   s.add_runtime_dependency "htmlentities", ["~> 4.3"]
   s.add_runtime_dependency "rack", ["~> 1.6"]
-  s.add_runtime_dependency "xml-simple", ["~> 1.1"]
   s.add_runtime_dependency "migrations", ["~> 1.0"]
 end

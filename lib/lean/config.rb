@@ -9,7 +9,7 @@ class Lean::Config
   def load_config
     config = {}
 
-    ["config/config.rb","../config/config.rb"].each do |path|
+    ["config/config.rb"].each do |path|
       if File.exist? path
         instance_eval(File.read(path)).each do |key, value|
           config[key] = value
