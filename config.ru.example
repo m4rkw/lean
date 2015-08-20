@@ -1,10 +1,9 @@
 
 require 'rack'
 require 'rack-slashenforce'
-require './core/lean.rb'
-require './core/threadwatch.rb'
+require 'lean'
 
-Thread.new do ThreadWatch.new end
+Thread.new do Lean::ThreadWatch.new end
 
 use Rack::AppendTrailingSlash
 use Rack::Static, :urls => ["/css/","/img/","/js/","/favicon.ico"], :root => "../public"
