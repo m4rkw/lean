@@ -1,0 +1,85 @@
+
+class Lean::HTTPFileMapper
+  def initialize(
+    filesystem_path:,
+    sort_field: nil,
+    sort_dir: nil,
+    request_path: nil,
+    model_class: 'MappedFile'
+  )
+    @filesystem_path = filesystem_path.gsub(/\/*\z/,'')
+    @uri = request_path.nil? ? URI.unescape(Lean::Request.path) : request_path
+    @full_path = (@filesystem_path + @uri).gsub(/\/*\z/,'')
+    @model_class = model_class
+    if sort_field.nil?
+      @sort_field = Object::const_get(model_class).defaultSortField
+    else
+      @sort_field = sort_field
+    end
+    if sort_dir.nil?
+      @sort_dir = Object::const_get(model_class).sortFields[@sort_field]
+    else
+      @sort_dir = sort_dir
+    end
+
+    if !allowed(@uri, @full_path)
+      raise RuntimeError, "Invalid path: #{@uri}"
+    end
+
+    if File.file? @full_path
+      download @full_path
+    end
+  end
+
+  def allowed(uri, full_path)
+    uri = uri.gsub(/\A\//,'').gsub(/\/\z/,'')
+    uri.empty? and return true
+
+    Dir.glob(@filesystem_path + "/**/*").include? full_path
+  end
+
+  def parent
+    @uri == '/' and return nil
+
+    path = @uri.gsub(/\/*\z/,'').split('/')
+    path.pop
+    path.join('/') + '/'
+  end
+
+  def is_file?
+    File.file? @full_path
+  end
+
+  def open
+    response = Rack::File.new(@filesystem_path).call(Lean::Request.instance.req.env)
+    response[1]["Content-disposition"] = "attachment; filename=\"#{@uri.split('/').last}\""
+
+    response
+  end
+
+  def download
+    response = open
+
+    response[1]["Content-Type"] = "application/octet-stream"
+    response[1]["Content-Transfer-Encoding"] = "Binary"
+
+    response
+  end
+
+  def files
+    files = []
+
+    Dir.glob(@full_path + "/**").each do |file|
+      while file.match /\/\//
+        file.gsub!(/\/\//,'/')
+      end
+      files.push Object::const_get(@model_class).new(file)
+    end
+
+    files.sort_by do |file|
+      file.instance_variable_get("@#{@sort_field}")
+    end
+
+    @sort_dir == 'desc' ? files.reverse : files
+  end
+end

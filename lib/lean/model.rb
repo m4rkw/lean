@@ -1,4 +1,6 @@
 
+require 'json'
+
 class Lean::Model
   include Lean::Renderer
 
@@ -29,5 +31,29 @@ class Lean::Model
       end
       instance_variable_set("@#{key}",value)
     end
+  end
+
+  def serialize(list='default')
+    if respond_to? 'serializeAttributes'
+      map = serializeAttributes
+      if !map[list]
+        raise "List #{list} is not defined for #{self.class} in serializeAttributes"
+      end
+      keys = map[list]
+    else
+      keys = instance_variables
+    end
+
+    serialized = {}
+
+    keys.each do |key|
+      if respond_to? key
+        serialized[key] = send key
+      else
+        serialized[key] = instance_variable_get("@#{key}")
+      end
+    end
+
+    serialized
   end
 end

@@ -40,9 +40,15 @@ module Lean::Renderer
 
     data['view'] = view
 
-    layout = erubis_view(layout_path, data)
+    render_html erubis_view(layout_path, data)
+  end
 
-    return [200, {'Content-Type' => 'text/html'}, [layout]]
+  def render_html(html)
+    [200, {'Content-Type' => 'text/html'}, [html]]
+  end
+
+  def render_json(data)
+    [200, {"Content-Type" => "application/json"}, [data.to_json]]
   end
 
   def partial(view, data={})
@@ -53,7 +59,6 @@ module Lean::Renderer
           if file.gsub(/\A.*?view\//, '') == "#{view}.erb"
             return erubis_view(file, data)
           end
-
         end
       end
     end
@@ -62,6 +67,14 @@ module Lean::Renderer
   end
 
   def render_file(file, headers={})
-    return [200, headers, [File.open(file).read]]
+    [200, headers, [File.open(file).read]]
+  end
+
+  def json(data)
+    if data.respond_to? 'serialize'
+      data = data.serialize
+    end
+
+    render_json data
   end
 end

@@ -15,7 +15,15 @@ $autoload_paths = [
 ]
 
 class Object
+  @@_const_missing_cache = {}
+
   def Object.const_missing(name)
+    if @@_const_missing_cache[name]
+      raise "Class not found: #{name.to_s}"
+    end
+
+    @@_const_missing_cache[name] = 1
+
     patterns = []
 
     $autoload_paths.each do |path|
@@ -42,6 +50,22 @@ class Object
       end
     end
     raise "Class not found: #{name.to_s}"
+  end
+end
+
+class Array
+  def serialize
+    serialized = []
+
+    self.each do |item|
+      if item.is_a?(Hash)
+        serialized.push item
+      else
+        serialized.push item.serialize
+      end
+    end
+
+    serialized
   end
 end
 
