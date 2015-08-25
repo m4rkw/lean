@@ -82,7 +82,7 @@ class Lean
 
     db = Lean::Config.get(:db)
 
-    Lean::DB.con = Sequel.connect("#{db[:type]}://#{db[:user]}:#{db[:pass]}@#{db[:host]}/#{db[:name]}")
+    Lean::DB.con = Sequel.connect(db)
 
     controller = Object::const_get(controller).new(method, args)
 
