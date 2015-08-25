@@ -43,12 +43,22 @@ module Lean::Renderer
     render_html erubis_view(layout_path, data)
   end
 
+  def response(code, headers, data=[])
+    resp = [code, headers, data]
+
+    Lean::Cookie.instance.cookies.each do |key, attrs|
+      Rack::Utils.set_cookie_header!(headers, key, attrs)
+    end
+
+    resp
+  end
+
   def render_html(html)
-    [200, {'Content-Type' => 'text/html'}, [html]]
+    response 200, {'Content-Type' => 'text/html'}, [html]
   end
 
   def render_json(data)
-    [200, {"Content-Type" => "application/json"}, [data.to_json]]
+    response 200, {"Content-Type" => "application/json"}, [data.to_json]
   end
 
   def partial(view, data={})
@@ -67,7 +77,7 @@ module Lean::Renderer
   end
 
   def render_file(file, headers={})
-    [200, headers, [File.open(file).read]]
+    response 200, headers, [File.open(file).read]
   end
 
   def json(data)

@@ -15,7 +15,7 @@ class Lean::ThreadWatch
   end
 
   def scan_dir(path, hash={})
-    Dir.glob("../**/*").each do |file|
+    Dir.glob("#{path}/**/*").each do |file|
       hash[path + "/" + file] = File.stat(path + "/" + file).mtime
     end
 

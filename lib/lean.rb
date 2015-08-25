@@ -11,6 +11,7 @@ $autoload_paths = [
     "core/",
     "lib/",
     "cont/",
+    "form/",
     "model/"
 ]
 
@@ -83,10 +84,18 @@ class Lean
 
     Lean::DB.con = Sequel.connect("#{db[:type]}://#{db[:user]}:#{db[:pass]}@#{db[:host]}/#{db[:name]}")
 
-    controller = Object::const_get(controller).new
+    controller = Object::const_get(controller).new(method, args)
 
     if !controller.respond_to? method
       return Lean::Controller.new.notfound
+    end
+
+    if controller.respond_to? 'beforeAction'
+      resp = controller.beforeAction(method, args)
+
+      if resp.kind_of? Array
+        return resp
+      end
     end
 
     controller.send(method, *args)

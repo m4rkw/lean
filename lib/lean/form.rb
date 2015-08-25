@@ -2,14 +2,46 @@
 class Lean::Form
   include Lean::Renderer
 
-  def initialize(postdata, fields)
-    @postdata = postdata
+  def fields
+    []
+  end
+
+  def initialize
+    if fields.empty?
+      raise "Fields are not defined on form class"
+    end
+
+    @postdata = Lean::Request.POST
     @fields = fields
     @errors = {}
 
     if !@postdata.empty?
       validate
     end
+  end
+
+  def respond_to?(method, include_private = false)
+    if method == 'fields'
+      super
+    else
+      fields.each do |field|
+        if field['name'] == method.to_s
+          return true
+        end
+      end
+
+      false
+    end
+  end
+
+  def method_missing method
+    fields.each do |field|
+      if field['name'] == method.to_s
+        return Lean::Request.POST[field['name']]
+      end
+    end
+
+    super
   end
 
   def config
@@ -45,6 +77,14 @@ class Lean::Form
     })
   end
 
+  def passwordinput(name, label, options={})
+    partial('form/passwordinput',{
+      'name' => name,
+      'label' => label,
+      'error' => @errors[name]
+    })
+  end
+
   def textarea(name, label, options={})
     partial('form/textarea',{
       'name' => name,
@@ -74,6 +114,8 @@ class Lean::Form
       case field['type']
       when "text"
         form += textinput(field["name"],field["label"])
+      when "password"
+        form += passwordinput(field["name"],field["label"])
       when "textarea"
         form += textarea(field["name"],field["label"])
       when "submit"
