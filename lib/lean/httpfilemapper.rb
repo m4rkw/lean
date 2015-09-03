@@ -10,6 +10,7 @@ class Lean::HTTPFileMapper
     @filesystem_path = filesystem_path.gsub(/\/*\z/,'')
     @uri = request_path.nil? ? URI.unescape(Lean::Request.path) : request_path
     @full_path = (@filesystem_path + @uri).gsub(/\/*\z/,'')
+
     @model_class = model_class
     if sort_field.nil?
       @sort_field = Object::const_get(model_class).defaultSortField
@@ -69,7 +70,7 @@ class Lean::HTTPFileMapper
   def files
     files = []
 
-    Dir.glob(@full_path + "/**").each do |file|
+    Dir.glob(@full_path.gsub(/\[/,'\\\[').gsub(/\]/,'\\\]') + "/**").each do |file|
       while file.match /\/\//
         file.gsub!(/\/\//,'/')
       end
