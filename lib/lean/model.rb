@@ -37,7 +37,10 @@ class Lean::Model
       if respond_to? "hydrate_#{key}"
         value = send "hydrate_#{key}", value
       end
-      instance_variable_set("@#{key}",value)
+      begin
+        instance_variable_set("@#{key}",value)
+      rescue NameError
+      end
     end
   end
 

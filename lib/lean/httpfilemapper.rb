@@ -52,10 +52,15 @@ class Lean::HTTPFileMapper
   end
 
   def open
-    response = Rack::File.new(@filesystem_path).call(Lean::Request.instance.req.env)
-    response[1]["Content-disposition"] = "attachment; filename=\"#{@uri.split('/').last}\""
+    escaped = Shellwords.escape(@full_path)
+    mimetype = `file -bi #{escaped} |cut -d ';' -f1`.chomp
 
-    response
+    [200, {
+        'X-Sendfile' => @full_path,
+        'Content-Type' => mimetype,
+        'Content-disposition' => "attachment; filename=\"#{@uri.split('/').last}\""
+      },
+      []]
   end
 
   def download
@@ -77,7 +82,7 @@ class Lean::HTTPFileMapper
       files.push Object::const_get(@model_class).new(file)
     end
 
-    files.sort_by do |file|
+    files = files.sort_by do |file|
       file.instance_variable_get("@#{@sort_field}")
     end
 

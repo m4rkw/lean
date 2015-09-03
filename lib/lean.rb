@@ -90,7 +90,7 @@ class Lean
     controller = Object::const_get(controller).new(method, args)
 
     if !controller.respond_to? method
-      return Lean::Controller.new.notfound
+      return Lean::Controller.new(method,args).notfound
     end
 
     if controller.respond_to? 'beforeAction'

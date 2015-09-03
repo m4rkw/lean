@@ -22,9 +22,11 @@ class Lean::Router
           if (m = Lean::Request.path.sub(/\A\//,'').sub(/\/\z/,'').match uri_pattern)
             route = route.split "#"
 
-            if m.length >1
-              args = []
+            if route[2]
+              route[2] = [route[2]]
+            end
 
+            if m.length >1
               for i in 1...m.length
                 regex = Regexp.new(Regexp.escape("$#{i}"))
                 if route[0].match regex
@@ -32,13 +34,18 @@ class Lean::Router
                   route[0][0] = route[0][0].upcase
                 elsif route[1].match regex
                   route[1].sub! regex, m[i]
-                else
-                  args.push m[i]
                 end
               end
+            end
 
-              if !args.empty?
-                route.push args
+            if route[2]
+              for i in 0...route[2].length
+                for j in 1...m.length
+                  regex = Regexp.new(Regexp.escape("$#{j}"))
+                  if route[2][i].match regex
+                    route[2][i].sub! regex, m[j]
+                  end
+                end
               end
             end
 
