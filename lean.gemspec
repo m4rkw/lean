@@ -18,6 +18,7 @@ Gem::Specification.new do |s|
                     "lib/lean/flash.rb",
                     "lib/lean/form.rb",
                     "lib/lean/httpfilemapper.rb",
+                    "lib/lean/log.rb",
                     "lib/lean/mappedfile.rb",
                     "lib/lean/model.rb",
                     "lib/lean/modelquery.rb",

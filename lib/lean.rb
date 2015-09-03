@@ -82,7 +82,10 @@ class Lean
 
     db = Lean::Config.get(:db)
 
+    Lean::Log.add("notice","#{Lean::Request.request_method} #{Lean::Request.url}")
+
     Lean::DB.con = Sequel.connect(db)
+    #Lean::Auth.logged_in
 
     controller = Object::const_get(controller).new(method, args)
 

@@ -41,7 +41,7 @@ class Lean::Model
     end
   end
 
-  def get(id)
+  def self.get(id)
     self.where(:id => id).first
   end
 

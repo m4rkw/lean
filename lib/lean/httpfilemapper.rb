@@ -27,7 +27,7 @@ class Lean::HTTPFileMapper
     end
 
     if File.file? @full_path
-      download @full_path
+      download
     end
   end
 
