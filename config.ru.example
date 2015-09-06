@@ -5,6 +5,8 @@ require 'lean'
 
 Thread.new do Lean::ThreadWatch.new end
 
+GC.enable
+
 use Rack::AppendTrailingSlash
 use Rack::Static, :urls => ["/css/","/img/","/js/","/favicon.ico"], :root => "../public"
 run Lean
