@@ -74,7 +74,11 @@ class Lean
   def self.call(env)
     Lean::Request.data = Rack::Request.new(env)
 
-    Lean.new.execute
+    resp = Lean.new.execute
+
+    GC.start
+
+    resp
   end
 
   def execute
