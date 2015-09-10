@@ -2,7 +2,7 @@
 module Lean::URITool
   def uri_sort(key, value, default_direction='asc')
     uri = Lean::Request.path.clone
-    params = Lean::Request.params.clone
+    params = Lean::Request.GET.clone
 
     alt_direction = (default_direction == 'asc') ? 'desc' : 'asc'
 
@@ -29,6 +29,6 @@ module Lean::URITool
   end
 
   def uri(uri)
-    parameterise uri, Lean::Request.params
+    parameterise uri, Lean::Request.GET
   end
 end

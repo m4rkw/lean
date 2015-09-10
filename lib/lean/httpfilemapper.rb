@@ -40,11 +40,7 @@ class Lean::HTTPFileMapper
   end
 
   def parent
-    @uri == '/' and return nil
-
-    path = @uri.gsub(/\/*\z/,'').split('/')
-    path.pop
-    path.join('/') + '/'
+    @uri == '/' ? nil : @uri.gsub(/\/*\z/,'').gsub(/\/[^\/]*?\z/,'') + '/'
   end
 
   def is_file?
