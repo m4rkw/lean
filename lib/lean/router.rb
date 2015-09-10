@@ -15,25 +15,25 @@ class Lean::Router
       routes[Lean::Request.request_method.downcase].each do |uri_pattern, route|
         uri = Lean::Request.path.sub(/\A\//,'').sub(/\/\z/,'')
 
-        if m = uri.match(uri_pattern)
-          path = route.split '#'
-          args = []
+        if matches = uri.match(uri_pattern)
+          path = substitute route.split('#'), matches
 
-          for i in 0...path.length
-            for j in 1...m.length
-              path[i].gsub! "$#{j}", m[j]
-            end
-
-            if i >= 2
-              args.push path[i]
-            end
-          end
-
-          return [path[0], path[1], args]
+          return [path[0], path[1], path[2...path.length]]
         end
       end
     end
 
     raise "No route found for #{Lean::Request.request_method} #{Lean::Request.path}"
+  end
+
+  def self.substitute(path, matches)
+    path.map! do |item|
+      for i in 1...matches.length
+        item.gsub! "$#{i}", matches[i]
+      end
+      item
+    end
+
+    path
   end
 end
