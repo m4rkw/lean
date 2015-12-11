@@ -1,14 +1,16 @@
 
 class Lean::HTTPFileMapper
   def initialize(
+    request: nil,
     filesystem_path:,
     sort_field: nil,
     sort_dir: nil,
     request_path: nil,
     model_class: 'MappedFile'
   )
+    @request = request
     @filesystem_path = filesystem_path.gsub(/\/*\z/,'')
-    @uri = request_path.nil? ? URI.unescape(Lean::Request.path) : request_path
+    @uri = request_path.nil? ? URI.unescape(@request.path) : request_path
     @full_path = (@filesystem_path + @uri).gsub(/\/*\z/,'')
 
     @model_class = model_class
@@ -57,6 +59,7 @@ class Lean::HTTPFileMapper
     mimetype = `file -bi #{escaped} |cut -d ';' -f1`.chomp
 
     [200, {
+        #'X-Accel-Redirect' => @full_path,
         'X-Sendfile' => @full_path,
         'Content-Type' => mimetype,
         'Content-disposition' => "attachment; filename=\"#{@uri.split('/').last}\""

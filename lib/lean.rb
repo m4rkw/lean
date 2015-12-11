@@ -72,22 +72,27 @@ end
 
 class Lean
   def self.call(env)
-    Lean::Request.data = Rack::Request.new(env)
+    #Lean::Request.data = Rack::Request.new(env)
 
-    Lean.new.execute
+    lean = Lean.new
+
+    lean.execute(Rack::Request.new(env))
   end
 
-  def execute
-    controller, method, args = Lean::Router::route
+  def execute(request)
+    controller, method, args = Lean::Router::route(request)
 
-    db = Lean::Config.get(:db)
+    db_config = Lean::Config.get(:db)
 
-    Lean::Log.add("notice","#{Lean::Request.request_method} #{Lean::Request.url}")
+    Lean::Log.add("notice","#{request.request_method} #{request.url}")
 
-    Lean::DB.con = Sequel.connect(db)
+    db = Sequel.connect(db_config)
     #Lean::Auth.logged_in
 
     controller = Object::const_get(controller).new(method, args)
+
+    controller.request = request
+    controller.db = db
 
     if !controller.respond_to? method
       return Lean::Controller.new(method,args).notfound

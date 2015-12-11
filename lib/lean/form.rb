@@ -6,12 +6,13 @@ class Lean::Form
     []
   end
 
-  def initialize
+  def initialize(request)
     if fields.empty?
       raise "Fields are not defined on form class"
     end
 
-    @postdata = Lean::Request.POST
+    @request = request
+    @postdata = @request.POST
     @fields = fields
     @errors = {}
 
@@ -37,7 +38,7 @@ class Lean::Form
   def method_missing method
     fields.each do |field|
       if field['name'] == method.to_s
-        return Lean::Request.POST[field['name']]
+        return @request.POST[field['name']]
       end
     end
 
@@ -61,7 +62,7 @@ class Lean::Form
   end
 
   def posted?
-    Lean::Request.post?
+    @request.post?
   end
 
   def valid?

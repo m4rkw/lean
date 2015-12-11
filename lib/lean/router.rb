@@ -10,10 +10,10 @@ class Lean::Router
     raise "routes.rb was not found."
   end
 
-  def self.route
-    if routes[Lean::Request.request_method.downcase]
-      routes[Lean::Request.request_method.downcase].each do |uri_pattern, route|
-        uri = Lean::Request.path.sub(/\A\//,'').sub(/\/\z/,'')
+  def self.route(request)
+    if routes[request.request_method.downcase]
+      routes[request.request_method.downcase].each do |uri_pattern, route|
+        uri = request.path.sub(/\A\//,'').sub(/\/\z/,'')
 
         if matches = uri.match(uri_pattern)
           path = substitute route.split('#'), matches
@@ -23,7 +23,7 @@ class Lean::Router
       end
     end
 
-    raise "No route found for #{Lean::Request.request_method} #{Lean::Request.path}"
+    raise "No route found for #{request.request_method} #{request.path}"
   end
 
   def self.substitute(path, matches)

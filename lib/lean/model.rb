@@ -4,18 +4,32 @@ require 'json'
 class Lean::Model
   include Lean::Renderer
 
+  attr_accessor :db
+
   @table = nil
+  @db = nil
 
   def self.table
     @table
+  end
+
+  def self.db
+    @db
+  end
+
+  def self.db=(db)
+    @db = db
   end
 
   def self.method_missing method, *args, &block
     if !@table
       raise "Table name is not defined for #{self.to_s}"
     end
+    if !@db
+      raise "No db object for #{self.to_s}"
+    end
 
-    Lean::ModelQuery.new(Lean::DB.con[@table].clone, self.to_s).send method, *args, &block
+    Lean::ModelQuery.new(@db[@table].clone, self.to_s).send method, *args, &block
   end
 
   def self.hydrate(data)
@@ -23,16 +37,18 @@ class Lean::Model
       objects = []
 
       data.each do |item|
-        objects.push Object::const_get(self.to_s).new(item)
+        objects.push Object::const_get(self.to_s).new(@db, item)
       end
 
       objects
     else
-      Object::const_get(self.to_s).new(data)
+      Object::const_get(self.to_s).new(@db, data)
     end
   end
 
-  def initialize(attributes={})
+  def initialize(db, attributes={})
+    @db = db
+
     attributes.each do |key, value|
       if respond_to? "hydrate_#{key}"
         value = send "hydrate_#{key}", value
@@ -79,7 +95,7 @@ class Lean::Model
 
     keys = {}
 
-    Lean::DB.con.schema(self.class.table).each do |key|
+    @db.schema(self.class.table).each do |key|
       if key[0] != 'id'
         keys[key[0]] = instance_variable_get("@#{key[0]}")
       end

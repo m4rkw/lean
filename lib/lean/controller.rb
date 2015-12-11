@@ -4,9 +4,10 @@ class Lean::Controller
   include Lean::URITool
 
   attr_reader :flash
+  attr_accessor :request
+  attr_accessor :db
 
   def initialize(method, args)
-    @db = Lean::DB.con
     @layout = "main"
     @flash = []
   end
