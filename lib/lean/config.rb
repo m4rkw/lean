@@ -11,9 +11,7 @@ class Lean::Config
 
     [File.dirname(__FILE__) + "/config/config.rb","config/config.rb"].each do |path|
       if File.exist? path
-        instance_eval(File.read(path)).each do |key, value|
-          config[key] = value
-        end
+        config = instance_eval(File.read(path))
       end
     end
 
