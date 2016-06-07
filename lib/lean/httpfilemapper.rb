@@ -6,12 +6,14 @@ class Lean::HTTPFileMapper
     sort_field: nil,
     sort_dir: nil,
     request_path: nil,
-    model_class: 'MappedFile'
+    model_class: 'MappedFile',
+    restrict_paths: []
   )
     @request = request
     @filesystem_path = filesystem_path.gsub(/\/*\z/,'')
     @uri = request_path.nil? ? URI.unescape(@request.path) : request_path
     @full_path = (@filesystem_path + @uri).gsub(/\/*\z/,'')
+    @restrict_paths = restrict_paths
 
     @model_class = model_class
     if sort_field.nil?
@@ -27,6 +29,21 @@ class Lean::HTTPFileMapper
 
     if !allowed(@uri, @full_path)
       raise RuntimeError, "Invalid path: #{@uri}"
+    end
+
+    if @uri != '/' and !@restrict_paths.empty?
+      allowed = false
+
+      @restrict_paths.each do |regex|
+        if @full_path.match(regex)
+          allowed = true
+          break
+        end
+      end
+
+      if !allowed
+        raise RuntimeError, "Invalid path: #{@uri}"
+      end
     end
 
     if File.file? @full_path
@@ -83,7 +100,23 @@ class Lean::HTTPFileMapper
       while file.match /\/\//
         file.gsub!(/\/\//,'/')
       end
-      files.push Object::const_get(@model_class).new(file)
+
+      if @restrict_paths.empty?
+        allowed = true
+      else
+        allowed = false
+
+        @restrict_paths.each do |regex|
+          if file.match(regex)
+            allowed = true
+            break
+          end
+        end
+      end
+
+      if allowed
+        files.push Object::const_get(@model_class).new(file)
+      end
     end
 
     files = files.sort_by do |file|
