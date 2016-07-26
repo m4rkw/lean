@@ -6,6 +6,7 @@ require 'htmlentities'
 require 'erubis'
 require 'singleton'
 require 'sequel'
+require 'mime/types'
 
 $autoload_paths = [
     "core/",
