@@ -41,6 +41,6 @@ Gem::Specification.new do |s|
   s.license     = 'MIT'
   s.add_runtime_dependency "sequel", ["~> 4.25"]
   s.add_runtime_dependency "htmlentities", ["~> 4.3"]
-  s.add_runtime_dependency "rack", ["~> 1.6"]
+  s.add_runtime_dependency "rack", ["~> 2.0"]
   s.add_runtime_dependency "migrations", ["~> 1.0"]
 end

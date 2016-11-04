@@ -73,7 +73,7 @@ class Lean::HTTPFileMapper
 
   def open
     escaped = Shellwords.escape(@full_path)
-    mimetype = MIME::Types.type_for(@full_path)
+    mimetype = MIME::Types.type_for(@full_path)[0].simplified
 
     [200, {
         #'X-Accel-Redirect' => @full_path,
