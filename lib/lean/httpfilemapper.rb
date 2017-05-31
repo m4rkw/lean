@@ -7,13 +7,22 @@ class Lean::HTTPFileMapper
     sort_dir: nil,
     request_path: nil,
     model_class: 'MappedFile',
-    restrict_paths: []
+    restrict_paths: [],
+		exclude_paths: []
   )
     @request = request
     @filesystem_path = filesystem_path.gsub(/\/*\z/,'')
     @uri = request_path.nil? ? URI.unescape(@request.path) : request_path
     @full_path = (@filesystem_path + @uri).gsub(/\/*\z/,'')
     @restrict_paths = restrict_paths
+		@exclude_paths = exclude_paths
+		@exclude_files = []
+
+    @exclude_paths.each do |exclude_path|
+      Dir.glob("#{exclude_path}/**/*", File::FNM_DOTMATCH).each do |file|
+        @exclude_files.push file
+      end
+    end
 
     @model_class = model_class
     if sort_field.nil?
@@ -77,7 +86,7 @@ class Lean::HTTPFileMapper
 
     [200, {
         #'X-Accel-Redirect' => @full_path,
-        'X-Sendfile' => @full_path,
+        'X-Accel-Redirect' => @full_path,
         'Content-Type' => mimetype,
         'Content-disposition' => "attachment; filename=\"#{@uri.split('/').last}\""
       },
@@ -112,6 +121,10 @@ class Lean::HTTPFileMapper
             break
           end
         end
+      end
+
+      if @exclude_files.include?(file) or @exclude_paths.include?(file)
+        allowed = false
       end
 
       if allowed
