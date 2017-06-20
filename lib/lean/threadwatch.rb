@@ -16,7 +16,7 @@ class Lean::ThreadWatch
 
   def scan_dir(path, hash={})
     Dir.glob("#{path}/**/*").each do |file|
-      if !file.match /^\.\/log\//
+      if File.file?(file) and !file.match /^\.\/log\//
         hash[path + "/" + file] = File.stat(path + "/" + file).mtime
       end
     end
