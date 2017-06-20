@@ -31,6 +31,7 @@ class Lean::ThreadWatch
 
     hash.each do |key,value|
       if new_hash[key] != value
+        puts "File changed: [#{key}] restarting..."
         return true
       end
     end
