@@ -83,11 +83,15 @@ class Lean
   def execute(request)
     controller, method, args = Lean::Router::route(request)
 
-    db_config = Lean::Config.get(:db)
+    begin
+      db_config = Lean::Config.get(:db)
+      db = Sequel.connect(db_config)
+    rescue
+      db = nil
+    end
 
     Lean::Log.add("notice","#{request.request_method} #{request.url}")
 
-    db = Sequel.connect(db_config)
     #Lean::Auth.logged_in
 
     controller = Object::const_get(controller).new(method, args)
