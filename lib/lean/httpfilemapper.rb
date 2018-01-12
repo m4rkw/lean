@@ -64,7 +64,7 @@ class Lean::HTTPFileMapper
     uri = uri.gsub(/\A\//,'').gsub(/\/\z/,'')
     uri.empty? and return true
 
-    Dir.glob(@filesystem_path + "/**/*").include? full_path
+    (Dir.glob(@filesystem_path + "/**/*", File::FNM_DOTMATCH).include?(full_path) || Dir.glob(@filesystem_path + "/.tv/**/*", File::FNM_DOTMATCH).include?(full_path))
   end
 
   def parent
