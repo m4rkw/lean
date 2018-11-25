@@ -111,6 +111,10 @@ class Lean
       end
     end
 
-    controller.send(method, *args)
+    resp = controller.send(method, *args)
+
+    controller.cleanup
+
+    resp
   end
 end

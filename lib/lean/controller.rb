@@ -22,4 +22,8 @@ class Lean::Controller
   def redirect uri
     response 302, {"Location" => uri}
   end
+
+  def cleanup
+    @db.disconnect
+  end
 end
