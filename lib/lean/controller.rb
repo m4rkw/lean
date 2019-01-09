@@ -24,6 +24,6 @@ class Lean::Controller
   end
 
   def cleanup
-    @db.disconnect
+    @db and @db.disconnect
   end
 end
